@@ -17,7 +17,7 @@ def main():
         # Task 1
         # ----------------------------------------
 
-        print("Task 1: how many users, activities and trackpoint in db. \n" )
+        print("Task 1: How many users, activities and trackpoint in db. \n" )
 
         result = db["users"].count_documents({})
         print("Total amount of users: ", result)
@@ -38,6 +38,19 @@ def main():
         print("Total amount of trackpoints: ", end="")
         for res in result:
             pprint(res["tot_tp"])
+
+        print("\n-----------------------------------------------\n")
+
+        # ----------------------------------------
+        # Task 2
+        # ----------------------------------------
+
+        print("Task 2: Find avg amount of activites per user.\n")
+
+        ant_activites = db["activity"].count_documents({})
+        ant_users = db["users"].count_documents({})
+
+        print("Avg activites per user: ", round(ant_activites / ant_users, 1))
 
         print("\n-----------------------------------------------\n")
 
