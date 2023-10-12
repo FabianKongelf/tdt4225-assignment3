@@ -61,3 +61,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# https://gitlab.stud.idi.ntnu.no/tdt4225lukrik/assignment3/-/tree/d37d03db4b643f018d234e0b1ad4210350b3e995
