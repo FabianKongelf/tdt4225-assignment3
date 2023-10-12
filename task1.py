@@ -49,11 +49,11 @@ def main():
 
             # reformate users
             for user_id in user_list:
-                    has_label = 1 if user_id in labels else 0
-                    user_docs.append({
-                        '_id':          user_id, 
-                        'has_label':    has_label
-                    })
+                has_label = 1 if user_id in labels else 0
+                user_docs.append({
+                    '_id':          user_id, 
+                    'has_label':    has_label
+                })
             
             # insert users
             program.create_coll("users")
@@ -65,7 +65,7 @@ def main():
             # --------------------------------------------------
 
             # create activity collection (table)
-            program.create_coll("activity")
+            # program.create_coll("activity")
             activity_id = 0
 
             # formate activites
@@ -157,9 +157,10 @@ def main():
 
                     activity_id += 1
 
-            # after loop all activities per user, insert activities
-            program.insert_documents("activity", activity_docs)
-            print("-- inserted activities")
+                # after loop all activities per user, insert activities
+                if len(activity_docs) > 0:
+                    program.insert_documents("activity", activity_docs)
+                print("-- inserted activities for ", user_id)
 
         except Exception as e:
             print("ERROR: Failed inserting data: ", e)
