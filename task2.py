@@ -3,33 +3,48 @@ from tabulate import tabulate
 from pprint import pprint 
 import os
 
-class Task2():
-    def __init__(self):
-        self.connection = DbConnector()
-        self.client = self.connection.client
-        self.db = self.connection.db
-    
-    def fetch_documents(self, collection_name):
-        collection = self.db[collection_name]
-        documents = collection.find({})
-        for doc in documents: 
-            pprint(doc)
 
 def main():
-    program = None
-
     # init program
     try:
-        program = Task2()
+        # program = Task2()
 
-        program.fetch_documents("users")
+        connection = DbConnector()
+        client = connection.client
+        db = connection.db
+
+        # ----------------------------------------
+        # Task 1
+        # ----------------------------------------
+
+        print("Task 1: how many users, activities and trackpoint in db. \n" )
+
+        result = db["users"].count_documents({})
+        print("Total amount of users: ", result)
+
+        result = db["activity"].count_documents({})
+        print("Total amount of activites: ", result)
+
+        result = db["activity"].aggregate([{
+            "$group": {
+                "_id": "null", 
+                "tot_tp": {
+                    "$sum": {
+                        "$size": "$trackpoints"
+                    }
+                }
+            }
+        }])
+        print("Total amount of trackpoints: ", end="")
+        for res in result:
+            pprint(res["tot_tp"])
+
+        print("\n-----------------------------------------------\n")
 
 
+        connection.close_connection()
     except Exception as e:
         print("ERROR: Failed to use database:", e)
-    finally:
-        if program:
-            program.connection.close_connection()
 
 if __name__ == '__main__':
     main()
