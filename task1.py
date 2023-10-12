@@ -113,7 +113,7 @@ def main():
                                 if len(trackpoints) > 0:
                                     altitude = trackpoints[-1][2]
                                 else:
-                                    altitude = 0
+                                    altitude = 0 # might be an issue
                             else:
                                 altitude = converted_line[3]
 
@@ -145,8 +145,6 @@ def main():
                             if row[0] == activity_start_data and row[1] == activity_end_data:
                                 activity_transportation_mode = row[2]
 
-
-
                     # create activity
                     activity_docs.append({
                         "_id":                  activity_id,
@@ -159,9 +157,9 @@ def main():
 
                     activity_id += 1
 
-                # after loop all activities per user, insert activities
-                program.insert_documents("activity", activity_docs)
-                print("-- inserted data for: " + user_id)
+            # after loop all activities per user, insert activities
+            program.insert_documents("activity", activity_docs)
+            print("-- inserted activities")
 
         except Exception as e:
             print("ERROR: Failed inserting data: ", e)
