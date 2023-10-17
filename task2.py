@@ -147,10 +147,32 @@ def main():
         # Task 8
         # ----------------------------------------
 
-        # print("Task 8: Find the top 20 users who have gained the most altitude meters ")
-        # Insert code here
+        print("Task 8: Find the top 20 users who have gained the most altitude meters (This query takes a long time)")
 
-        # print("\n-----------------------------------------------\n")
+        # identify all users
+        users = db["users"].find()
+        result = []
+
+        # loop thourgh every user
+        for user in users:
+            activites = db["activity"].find({ "user": user["_id"] })
+            
+            altitude = 0
+            for activity in activites:
+                for i in range(1, len(activity["trackpoints"])):
+                    gain = (float(activity["trackpoints"][(i-1)]["altitude"]) - float(activity["trackpoints"][i]["altitude"]))
+                    if gain > 0:
+                        altitude += gain
+            result.append({"id": user["_id"], "altitude": altitude})
+            # print({"id": user["_id"], "altitude": altitude})
+        
+        sorted_result = sorted(result, key=lambda x: x["altitude"], reverse=True)
+        for i in range(0, 20):
+            print(round(sorted_result[i], 0))
+
+                
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------

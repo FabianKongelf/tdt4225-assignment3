@@ -15,7 +15,7 @@ def main():
 
         result = db["activity"].aggregate([{
             "$group": {
-                "_id": "$transportation_mode",
+                "_id": "null",
                 "tot": { "$sum": 1 }
             }
         }])
