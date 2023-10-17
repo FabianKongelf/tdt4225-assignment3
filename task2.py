@@ -60,11 +60,13 @@ def main():
         # Task 3
         # ----------------------------------------
 
-        # print("Task 3: Find the top 20 users with the highest number of activities \n")
+        print("Task 3: Find the top 20 users with the highest number of activities \n")
 
-        # Insert code here
+        result = db["activity"].aggregate([{ "$group": { "_id": "$user", "tot": { "$sum": 1 } } }, { "$sort": { "tot": -1 } }, { "$limit": 20 } ] )
+        for res in result:
+            pprint(res)
 
-        # print("\n-----------------------------------------------\n")
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
