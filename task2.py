@@ -17,7 +17,7 @@ def main():
         # Task 1
         # ----------------------------------------
 
-        print("Task 1: How many users, activities and trackpoint in db. \n" )
+        print("Task 1: How many users, activities and trackpoints are there in the dataset \n" )
 
         result = db["users"].count_documents({})
         print("Total amount of users: ", result)
@@ -62,18 +62,20 @@ def main():
 
         print("Task 3: Find the top 20 users with the highest number of activities \n")
 
-        result = db["activity"].aggregate([{ 
-                "$group": { 
-                    "_id": "$user", 
-                    "tot": { "$sum": 1 } 
-                } 
-            }, { 
-                "$sort": { "tot": -1 } 
-            }, { 
-                "$limit": 20 
-            }])
-        for res in result:
-            pprint(res)
+        pipeline = [
+            { "$group": {
+                "_id": "$user",
+                "count": { "$sum": 1 }
+                }
+            },
+            { "$sort": { "count": -1 } },
+        { "$limit": 20 }
+        ]
+
+        result = db.activity.aggregate(pipeline)
+
+        for document in result:
+            print(document)
 
         print("\n-----------------------------------------------\n")
 
@@ -117,6 +119,7 @@ def main():
 
         print("\n-----------------------------------------------\n")
 
+        
 
         # ----------------------------------------
         # Task 6
@@ -124,9 +127,19 @@ def main():
 
         # print("Task 6: a) Find the year with the most activities \n")
 
-        # Insert code here
+        pipeline = [
+            {"$project": {"year": {"$year": {"$dateFromString": {"dateString": "$start_date","format": "%Y/%m/%d %H:%M:%S"}}}}},
+            {"$group": {"_id": "$year", "count": { "$sum": 1 }}},
+            {"$sort": {"count": -1}},
+            {"$limit": 1}
+        ]
 
-        # print("Task 6: b) Is this also the year with most recorded hours? \n")
+        result = list(db.activity.aggregate(pipeline))
+
+        for document in result:
+            print(document)
+
+        # print("\n\nTask 6: b) Find the year with the most recorded hours \n")
 
         # Insert code here
 
@@ -199,7 +212,7 @@ def main():
         # Task 11
         # ----------------------------------------
 
-        # print("Task 10: Find all users who have registered transportation_mode and their most used transportation_mode ")
+        # print("Task 11: Find all users who have registered transportation_mode and their most used transportation_mode ")
         # Insert code here
 
         # print("\n-----------------------------------------------\n")
