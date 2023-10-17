@@ -41,6 +41,7 @@ def main():
 
         print("\n-----------------------------------------------\n")
 
+
         # ----------------------------------------
         # Task 2
         # ----------------------------------------
@@ -54,6 +55,103 @@ def main():
 
         print("\n-----------------------------------------------\n")
 
+
+        # ----------------------------------------
+        # Task 3
+        # ----------------------------------------
+
+        # print("Task 3: Find the top 20 users with the highest number of activities \n")
+
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 4
+        # ----------------------------------------
+
+        # print("Task 4: Find all users who have taken a taxi \n")
+
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 5
+        # ----------------------------------------
+
+        # print("Task 5: Find all types of transportation modes and count how many activities that are tagged with these transportation mode labels. Do not count the rows where the mode is null \n")
+
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 6
+        # ----------------------------------------
+
+        # print("Task 6: a) Find the year with the most activities \n")
+
+        # Insert code here
+
+        # print("Task 6: b) Is this also the year with most recorded hours? \n")
+
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 7
+        # ----------------------------------------
+
+        # print("Task 7: Find the total distance (in km) walked in 2008, by user with id=112 ")
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 8
+        # ----------------------------------------
+
+        # print("Task 8: Find the top 20 users who have gained the most altitude meters ")
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 9
+        # ----------------------------------------
+
+        # print("Task 9: Find all users who have invalid activities, and the number of invalid activities per user ")
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 10
+        # ----------------------------------------
+
+        # print("Task 10: Find the users who have tracked an activity in the Forbidden City of Beijing ")
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
+
+
+        # ----------------------------------------
+        # Task 11
+        # ----------------------------------------
+
+        # print("Task 10: Find all users who have registered transportation_mode and their most used transportation_mode ")
+        # Insert code here
+
+        # print("\n-----------------------------------------------\n")
 
         connection.close_connection()
     except Exception as e:
