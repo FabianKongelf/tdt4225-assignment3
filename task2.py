@@ -61,7 +61,6 @@ def main():
         # ----------------------------------------
 
         print("Task 3: Find the top 20 users with the highest number of activities \n")
-        print("Task 3: Find the top 20 users with the highest number of activities \n")
 
         pipeline = [
             { "$group": {
@@ -140,7 +139,7 @@ def main():
         for document in result:
             print(document)
 
-        # print("Task 6: b) Find the year with the most recorded hours \n")
+        # print("\n\nTask 6: b) Find the year with the most recorded hours \n")
 
         # Insert code here
 
