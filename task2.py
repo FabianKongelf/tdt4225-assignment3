@@ -17,7 +17,7 @@ def main():
         # Task 1
         # ----------------------------------------
 
-        print("Task 1: How many users, activities and trackpoint in db. \n" )
+        print("Task 1: How many users, activities and trackpoints are there in the dataset \n" )
 
         result = db["users"].count_documents({})
         print("Total amount of users: ", result)
@@ -60,11 +60,24 @@ def main():
         # Task 3
         # ----------------------------------------
 
-        # print("Task 3: Find the top 20 users with the highest number of activities \n")
+        print("Task 3: Find the top 20 users with the highest number of activities \n")
 
-        # Insert code here
+        pipeline = [
+            { "$group": {
+                "_id": "$user",
+                "count": { "$sum": 1 }
+                }
+            },
+            { "$sort": { "count": -1 } },
+        { "$limit": 20 }
+        ]
 
-        # print("\n-----------------------------------------------\n")
+        result = db.activity.aggregate(pipeline)
+
+        for document in result:
+            print(document)
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -97,7 +110,7 @@ def main():
 
         # Insert code here
 
-        # print("Task 6: b) Is this also the year with most recorded hours? \n")
+        # print("Task 6: b) Find the year with the most recorded hours \n")
 
         # Insert code here
 
@@ -148,7 +161,7 @@ def main():
         # Task 11
         # ----------------------------------------
 
-        # print("Task 10: Find all users who have registered transportation_mode and their most used transportation_mode ")
+        # print("Task 11: Find all users who have registered transportation_mode and their most used transportation_mode ")
         # Insert code here
 
         # print("\n-----------------------------------------------\n")
