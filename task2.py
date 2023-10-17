@@ -62,7 +62,16 @@ def main():
 
         print("Task 3: Find the top 20 users with the highest number of activities \n")
 
-        result = db["activity"].aggregate([{ "$group": { "_id": "$user", "tot": { "$sum": 1 } } }, { "$sort": { "tot": -1 } }, { "$limit": 20 } ] )
+        result = db["activity"].aggregate([{ 
+                "$group": { 
+                    "_id": "$user", 
+                    "tot": { "$sum": 1 } 
+                } 
+            }, { 
+                "$sort": { "tot": -1 } 
+            }, { 
+                "$limit": 20 
+            }])
         for res in result:
             pprint(res)
 
@@ -84,11 +93,29 @@ def main():
         # Task 5
         # ----------------------------------------
 
-        # print("Task 5: Find all types of transportation modes and count how many activities that are tagged with these transportation mode labels. Do not count the rows where the mode is null \n")
+        print("Task 5: Find all types of transportation modes and count how many activities that are tagged with these transportation mode labels. Do not count the rows where the mode is null \n")
 
-        # Insert code here
+        result = db["activity"].aggregate([{
+                "$match": {
+                    "transportation_mode": {
+                        "$ne": "none"
+                    }
+                }
+            }, {
+                "$group": {
+                    "_id": "$transportation_mode",
+                    "tot": { "$sum": 1 }
+                }
+            }, {
+                "$sort": {
+                    "tot": -1
+                }
+            }])
+        for res in result:
+            pprint(res)
 
-        # print("\n-----------------------------------------------\n")
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
