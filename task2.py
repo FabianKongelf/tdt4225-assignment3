@@ -3,7 +3,10 @@ from tabulate import tabulate
 from pprint import pprint
 from haversine import haversine, Unit
 import numpy as np
+from datetime import datetime
 import os
+
+
 
 
 def main():
@@ -128,7 +131,7 @@ def main():
         print("Task 6: a) Find the year with the most activities \n")
 
         # years of the dataset
-        years = ["2007", "2008", "2009", "2010", "2011"]
+        years = ["2007", "2008", "2009", "2010", "2011", "2012"]
 
         # list for storing activity counts of each year (index 0 = 2007, index 1 = 2008, ...)
         activity_counts = []
@@ -147,7 +150,7 @@ def main():
             ])
             
             # the aggregate function returns a cursor containing dictionaries
-            # these dictionaries are parsed and the number of activities are added to the activity_counts list
+            # these dictionaries are parsed and the number of activities per year are added to the activity_counts list
             for doc in cursor:
                 key = f"activities_in_{year}"
                 activity_count = doc[key]
@@ -159,13 +162,50 @@ def main():
         print(f'{most_active_year} was the year with most activities, reaching {most_activities} activities')
         
 
-
         print("\n\nTask 6: b) Find the year with the most recorded hours \n")
 
-        # Insert code here
+        # dictionary for each year 2007 - 2012
+        hours_per_year = {
+          2007 : 0,
+          2008 : 0,
+          2009 : 0,
+          2010 : 0,
+          2011 : 0,
+          2012 : 0,
+          "garbage": 0
+        }
 
+        # function for calculating the difference in hours between two dates
+        def hourDifference(d1, d2):
+                    date_format = '%Y/%m/%d %H:%M:%S'
+                    datetime1 = datetime.strptime(d1, date_format)
+                    datetime2 = datetime.strptime(d2, date_format)
+                    difference = datetime2 - datetime1
+                    hours_difference = difference.total_seconds() / 3600  # There are 3600 seconds in one hour.
+                    return hours_difference
+
+        # Query
+        cursor = db["activity"].find(
+            {
+                #   "user": "001" 
+             },
+            { "start_date": 1, "end_date": 1, "_id": 0 })
+        
+        for doc in cursor:
+            d1 = (doc['start_date'])
+            d2 = (doc['end_date'])
+            hours = hourDifference(d1, d2)
+            yearOfActivity = int(d1.split("/")[0])
+            if yearOfActivity in hours_per_year:
+                hours_per_year[yearOfActivity] += hours
+            else: 
+                hours_per_year["garbage"] += hours
+        
+        max_key = max(hours_per_year, key=hours_per_year.get)
+        max_value = hours_per_year[max_key]
+
+        print(f"{max_key} was the year with the most recorded hours, reaching {max_value} hours")
         print("\n-----------------------------------------------\n")
-
 
         # ----------------------------------------
         # Task 7
