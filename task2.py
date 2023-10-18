@@ -150,7 +150,7 @@ def main():
         print("Task 6: a) Find the year with the most activities \n")
 
         # years of the dataset
-        years = ["2007", "2008", "2009", "2010", "2011"]
+        years = ["2007", "2008", "2009", "2010", "2011", "2012"]
 
         # list for storing activity counts of each year (index 0 = 2007, index 1 = 2008, ...)
         activity_counts = []
@@ -187,7 +187,18 @@ def main():
         # Insert code here
 
         print("\n-----------------------------------------------\n")
-        # Function used for calculating difference between two dates in the mongoDB format of our database
+        # dictionary for each year 2007 - 2012
+        hours_per_year = {
+          2007 : 0,
+          2008 : 0,
+          2009 : 0,
+          2010 : 0,
+          2011 : 0,
+          2012 : 0,
+          "garbage": 0
+        }
+
+        # function for calculating the difference in hours between two dates
         def hourDifference(d1, d2):
                     date_format = '%Y/%m/%d %H:%M:%S'
                     datetime1 = datetime.strptime(d1, date_format)
@@ -196,12 +207,26 @@ def main():
                     hours_difference = difference.total_seconds() / 3600  # There are 3600 seconds in one hour.
                     return hours_difference
 
-
-        # Example of the aforementioned function
-        # d1 = '2008/11/12 09:14:00'
-        # d2 = '2008/11/12 09:16:10'
-
-        # print(hourDifference(d1, d2))
+        # Query
+        cursor = db["activity"].find(
+            {
+                #   "user": "001" 
+             },
+            { "start_date": 1, "end_date": 1, "_id": 0 })
+        
+        for doc in cursor:
+            d1 = (doc['start_date'])
+            d2 = (doc['end_date'])
+            hours = hourDifference(d1, d2)
+            yearOfActivity = int(d1.split("/")[0])
+            if yearOfActivity in hours_per_year:
+                hours_per_year[yearOfActivity] += hours
+            else: 
+                hours_per_year["garbage"] += hours
+        
+        # printing each year of the dictionary
+        for key, value in hours_per_year.items():
+             print(key, value)
 
         # ----------------------------------------
         # Task 7
