@@ -1,7 +1,10 @@
 from DbConnector import DbConnector
 from tabulate import tabulate
 from pprint import pprint 
+from datetime import datetime
 import os
+
+
 
 
 def main():
@@ -166,7 +169,7 @@ def main():
             ])
             
             # the aggregate function returns a cursor containing dictionaries
-            # these dictionaries are parsed and the number of activities are added to the activity_counts list
+            # these dictionaries are parsed and the number of activities per year are added to the activity_counts list
             for doc in cursor:
                 key = f"activities_in_{year}"
                 activity_count = doc[key]
@@ -178,13 +181,27 @@ def main():
         print(f'{most_active_year} was the year with most activities, reaching {most_activities} activities')
         
 
-
         print("\n\nTask 6: b) Find the year with the most recorded hours \n")
+        
 
         # Insert code here
 
         print("\n-----------------------------------------------\n")
+        # Function used for calculating difference between two dates in the mongoDB format of our database
+        def hourDifference(d1, d2):
+                    date_format = '%Y/%m/%d %H:%M:%S'
+                    datetime1 = datetime.strptime(d1, date_format)
+                    datetime2 = datetime.strptime(d2, date_format)
+                    difference = datetime2 - datetime1
+                    hours_difference = difference.total_seconds() / 3600  # There are 3600 seconds in one hour.
+                    return hours_difference
 
+
+        # Example of the aforementioned function
+        # d1 = '2008/11/12 09:14:00'
+        # d2 = '2008/11/12 09:16:10'
+
+        # print(hourDifference(d1, d2))
 
         # ----------------------------------------
         # Task 7
