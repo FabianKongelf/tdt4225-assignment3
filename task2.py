@@ -17,67 +17,67 @@ def main():
         # Task 1
         # ----------------------------------------
 
-        print("Task 1: How many users, activities and trackpoints are there in the dataset \n" )
+        # print("Task 1: How many users, activities and trackpoints are there in the dataset \n" )
 
-        result = db["users"].count_documents({})
-        print("Total amount of users: ", result)
+        # result = db["users"].count_documents({})
+        # print("Total amount of users: ", result)
 
-        result = db["activity"].count_documents({})
-        print("Total amount of activites: ", result)
+        # result = db["activity"].count_documents({})
+        # print("Total amount of activites: ", result)
 
-        result = db["activity"].aggregate([{
-            "$group": {
-                "_id": "null", 
-                "tot_tp": {
-                    "$sum": {
-                        "$size": "$trackpoints"
-                    }
-                }
-            }
-        }])
-        print("Total amount of trackpoints: ", end="")
-        for res in result:
-            pprint(res["tot_tp"])
+        # result = db["activity"].aggregate([{
+        #     "$group": {
+        #         "_id": "null", 
+        #         "tot_tp": {
+        #             "$sum": {
+        #                 "$size": "$trackpoints"
+        #             }
+        #         }
+        #     }
+        # }])
+        # print("Total amount of trackpoints: ", end="")
+        # for res in result:
+        #     pprint(res["tot_tp"])
 
-        print("\n-----------------------------------------------\n")
+        # print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
         # Task 2
         # ----------------------------------------
 
-        print("Task 2: Find avg amount of activites per user.\n")
+        # print("Task 2: Find avg amount of activites per user.\n")
 
-        ant_activites = db["activity"].count_documents({})
-        ant_users = db["users"].count_documents({})
+        # ant_activites = db["activity"].count_documents({})
+        # ant_users = db["users"].count_documents({})
 
-        print("Avg activites per user: ", round(ant_activites / ant_users, 1))
+        # print("Avg activites per user: ", round(ant_activites / ant_users, 1))
 
-        print("\n-----------------------------------------------\n")
+        # print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
         # Task 3
         # ----------------------------------------
 
-        print("Task 3: Find the top 20 users with the highest number of activities \n")
+        # print("Task 3: Find the top 20 users with the highest number of activities \n")
 
-        pipeline = [
-            { "$group": {
-                "_id": "$user",
-                "count": { "$sum": 1 }
-                }
-            },
-            { "$sort": { "count": -1 } },
-        { "$limit": 20 }
-        ]
+        # pipeline = [
+        #     { "$group": {
+        #         "_id": "$user",
+        #         "count": { "$sum": 1 }
+        #         }
+        #     },
+        #     { "$sort": { "count": -1 } },
+        # { "$limit": 20 }
+        # ]
 
-        result = db.activity.aggregate(pipeline)
+        # result = db.activity.aggregate(pipeline)
 
-        for document in result:
-            print(document)
+        # for document in result:
+        #     print(document)
 
-        print("\n-----------------------------------------------\n")
+        # print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -95,29 +95,29 @@ def main():
         # Task 5
         # ----------------------------------------
 
-        print("Task 5: Find all types of transportation modes and count how many activities that are tagged with these transportation mode labels. Do not count the rows where the mode is null \n")
+        # print("Task 5: Find all types of transportation modes and count how many activities that are tagged with these transportation mode labels. Do not count the rows where the mode is null \n")
 
-        result = db["activity"].aggregate([{
-                "$match": {
-                    "transportation_mode": {
-                        "$ne": "none"
-                    }
-                }
-            }, {
-                "$group": {
-                    "_id": "$transportation_mode",
-                    "tot": { "$sum": 1 }
-                }
-            }, {
-                "$sort": {
-                    "tot": -1
-                }
-            }])
-        for res in result:
-            pprint(res)
+        # result = db["activity"].aggregate([{
+        #         "$match": {
+        #             "transportation_mode": {
+        #                 "$ne": "none"
+        #             }
+        #         }
+        #     }, {
+        #         "$group": {
+        #             "_id": "$transportation_mode",
+        #             "tot": { "$sum": 1 }
+        #         }
+        #     }, {
+        #         "$sort": {
+        #             "tot": -1
+        #         }
+        #     }])
+        # for res in result:
+        #     pprint(res)
 
 
-        print("\n-----------------------------------------------\n")
+        # print("\n-----------------------------------------------\n")
 
         
 
@@ -125,19 +125,33 @@ def main():
         # Task 6
         # ----------------------------------------
 
-        # print("Task 6: a) Find the year with the most activities \n")
+        print("Task 6: a) Find the year with the most activities \n")
 
-        pipeline = [
-            {"$project": {"year": {"$year": {"$dateFromString": {"dateString": "$start_date","format": "%Y/%m/%d %H:%M:%S"}}}}},
-            {"$group": {"_id": "$year", "count": { "$sum": 1 }}},
-            {"$sort": {"count": -1}},
-            {"$limit": 1}
-        ]
+        years = ["2007", "2008", "2009", "2010", "2011"]
+        activity_counts = []
 
-        result = list(db.activity.aggregate(pipeline))
+        for year in years:
+            cursor = db["activity"].aggregate([
+                {"$match": {
+                    "$or": [
+                        {"start_date": {"$regex": year}},
+                        {"end_date": {"$regex": year}}
+                    ]
+                }},
+                {"$count": f"activities_in_{year}"}
+            ])
 
-        for document in result:
-            print(document)
+            for doc in cursor:
+                key = f"activities_in_{year}"
+                if key in doc:
+                    activity_count = doc[key]
+                    activity_counts.append(activity_count) 
+    
+        most_activities = max(activity_counts)
+        most_active_year = activity_counts.index(most_activities) + 2007
+        print(f'{most_active_year} was the year with most activities, reaching {most_activities} activities')
+        
+
 
         # print("\n\nTask 6: b) Find the year with the most recorded hours \n")
 
