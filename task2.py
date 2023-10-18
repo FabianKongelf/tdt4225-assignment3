@@ -116,8 +116,27 @@ def main():
         # for res in result:
         #     pprint(res)
 
+        result = db["activity"].aggregate([{
+                "$match": {
+                    "transportation_mode": {
+                        "$ne": "none"
+                    }
+                }
+            }, {
+                "$group": {
+                    "_id": "$transportation_mode",
+                    "tot": { "$sum": 1 }
+                }
+            }, {
+                "$sort": {
+                    "tot": -1
+                }
+            }])
 
-        # print("\n-----------------------------------------------\n")
+        print("Mode | activities")
+        print(tabulate(result))
+
+        print("\n-----------------------------------------------\n")
 
         
 
@@ -153,11 +172,11 @@ def main():
         
 
 
-        # print("\n\nTask 6: b) Find the year with the most recorded hours \n")
+        print("\n\nTask 6: b) Find the year with the most recorded hours \n")
 
         # Insert code here
 
-        # print("\n-----------------------------------------------\n")
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -174,10 +193,33 @@ def main():
         # Task 8
         # ----------------------------------------
 
-        # print("Task 8: Find the top 20 users who have gained the most altitude meters ")
-        # Insert code here
+        print("Task 8: Find the top 20 users who have gained the most altitude meters (This query takes a long time) \n")
 
-        # print("\n-----------------------------------------------\n")
+        # identify all users
+        users = db["users"].find()
+        result = []
+
+        # loop thourgh every user
+        for user in users:
+            activites = db["activity"].find({ "user": user["_id"] })
+            
+            altitude = 0
+            for activity in activites:
+                for i in range(1, len(activity["trackpoints"])):
+                    gain = (float(activity["trackpoints"][(i-1)]["altitude"]) - float(activity["trackpoints"][i]["altitude"]))
+                    if gain > 0:
+                        altitude += gain
+            result.append({"id": user["_id"], "altitude": altitude})
+            # print({"id": user["_id"], "altitude": altitude})
+        
+        print("User | Altitude gain")
+        sorted_result = sorted(result, key=lambda x: x["altitude"], reverse=True)
+        for i in range(0, 20):
+            print(round(sorted_result[i], 0))
+
+                
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -204,10 +246,38 @@ def main():
         # Task 11
         # ----------------------------------------
 
-        # print("Task 11: Find all users who have registered transportation_mode and their most used transportation_mode ")
-        # Insert code here
+        print("Task 11: Find all users who have registered transportation_mode and their most used transportation_mode ")
+        
+        result = db["activity"].aggregate([
+        { # all activites with a transportation mode not none
+            "$match": {
+                "transportation_mode": {
+                    "$ne": "none"
+                }
+            }
+        }, { # group on user and transportation mode
+            "$group": {
+                "_id": {
+                    "user": "$user", 
+                    "mode": "$transportation_mode"
+                },
+                "count": { "$sum": 1 }
+            }
+        }, { # sort count highest first
+            "$sort": { "count": -1 }
+        }, { # reformat to list only first entry (highest)
+            "$group": {
+                "_id": "$_id.user",
+                "most_used_mode": { "$first": "$_id.mode" },
+            }
+        }, { # sort so lowest id is first, aestetic
+            "$sort": { "_id": 1 }
+        }])
 
-        # print("\n-----------------------------------------------\n")
+        print("User | Mode")
+        print(tabulate(result))
+
+        print("\n-----------------------------------------------\n")
 
         connection.close_connection()
     except Exception as e:
