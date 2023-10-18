@@ -72,10 +72,10 @@ def main():
         { "$limit": 20 }
         ]
 
-        result = db.activity.aggregate(pipeline)
-
-        for document in result:
-            print(document)
+        result = db["activity"].aggregate(pipeline)
+        
+        print("User | Activities")
+        print(tabulate(result))
 
         print("\n-----------------------------------------------\n")
 
@@ -113,9 +113,9 @@ def main():
                     "tot": -1
                 }
             }])
-        for res in result:
-            pprint(res)
 
+        print("Mode | activities")
+        print(tabulate(result))
 
         print("\n-----------------------------------------------\n")
 
@@ -125,7 +125,7 @@ def main():
         # Task 6
         # ----------------------------------------
 
-        # print("Task 6: a) Find the year with the most activities \n")
+        print("Task 6: a) Find the year with the most activities \n")
 
         pipeline = [
             {"$project": {"year": {"$year": {"$dateFromString": {"dateString": "$start_date","format": "%Y/%m/%d %H:%M:%S"}}}}},
@@ -139,11 +139,11 @@ def main():
         for document in result:
             print(document)
 
-        # print("\n\nTask 6: b) Find the year with the most recorded hours \n")
+        print("\n\nTask 6: b) Find the year with the most recorded hours \n")
 
         # Insert code here
 
-        # print("\n-----------------------------------------------\n")
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -160,7 +160,7 @@ def main():
         # Task 8
         # ----------------------------------------
 
-        print("Task 8: Find the top 20 users who have gained the most altitude meters (This query takes a long time)")
+        print("Task 8: Find the top 20 users who have gained the most altitude meters (This query takes a long time) \n")
 
         # identify all users
         users = db["users"].find()
@@ -179,6 +179,7 @@ def main():
             result.append({"id": user["_id"], "altitude": altitude})
             # print({"id": user["_id"], "altitude": altitude})
         
+        print("User | Altitude gain")
         sorted_result = sorted(result, key=lambda x: x["altitude"], reverse=True)
         for i in range(0, 20):
             print(round(sorted_result[i], 0))
@@ -212,10 +213,38 @@ def main():
         # Task 11
         # ----------------------------------------
 
-        # print("Task 11: Find all users who have registered transportation_mode and their most used transportation_mode ")
-        # Insert code here
+        print("Task 11: Find all users who have registered transportation_mode and their most used transportation_mode ")
+        
+        result = db["activity"].aggregate([
+        { # all activites with a transportation mode not none
+            "$match": {
+                "transportation_mode": {
+                    "$ne": "none"
+                }
+            }
+        }, { # group on user and transportation mode
+            "$group": {
+                "_id": {
+                    "user": "$user", 
+                    "mode": "$transportation_mode"
+                },
+                "count": { "$sum": 1 }
+            }
+        }, { # sort count highest first
+            "$sort": { "count": -1 }
+        }, { # reformat to list only first entry (highest)
+            "$group": {
+                "_id": "$_id.user",
+                "most_used_mode": { "$first": "$_id.mode" },
+            }
+        }, { # sort so lowest id is first, aestetic
+            "$sort": { "_id": 1 }
+        }])
 
-        # print("\n-----------------------------------------------\n")
+        print("User | Mode")
+        print(tabulate(result))
+
+        print("\n-----------------------------------------------\n")
 
         connection.close_connection()
     except Exception as e:
