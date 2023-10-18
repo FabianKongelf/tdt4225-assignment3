@@ -182,11 +182,7 @@ def main():
         
 
         print("\n\nTask 6: b) Find the year with the most recorded hours \n")
-        
 
-        # Insert code here
-
-        print("\n-----------------------------------------------\n")
         # dictionary for each year 2007 - 2012
         hours_per_year = {
           2007 : 0,
@@ -227,6 +223,12 @@ def main():
         # printing each year of the dictionary
         for key, value in hours_per_year.items():
              print(key, value)
+        
+        max_key = max(hours_per_year, key=hours_per_year.get)
+        max_value = hours_per_year[max_key]
+
+        print(f"{max_key} was the year with the most recorded hours, reaching {max_value} hours")
+        print("\n-----------------------------------------------\n")
 
         # ----------------------------------------
         # Task 7
