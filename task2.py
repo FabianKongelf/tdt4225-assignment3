@@ -1,14 +1,14 @@
 from DbConnector import DbConnector
 from tabulate import tabulate
-from pprint import pprint 
+from pprint import pprint
+from haversine import haversine, Unit
+import numpy as np
 import os
 
 
 def main():
     # init program
     try:
-        # program = Task2()
-
         connection = DbConnector()
         client = connection.client
         db = connection.db
@@ -17,67 +17,67 @@ def main():
         # Task 1
         # ----------------------------------------
 
-        # print("Task 1: How many users, activities and trackpoints are there in the dataset \n" )
+        print("Task 1: How many users, activities and trackpoints are there in the dataset \n" )
 
-        # result = db["users"].count_documents({})
-        # print("Total amount of users: ", result)
+        result = db["users"].count_documents({})
+        print("Total amount of users: ", result)
 
-        # result = db["activity"].count_documents({})
-        # print("Total amount of activites: ", result)
+        result = db["activity"].count_documents({})
+        print("Total amount of activites: ", result)
 
-        # result = db["activity"].aggregate([{
-        #     "$group": {
-        #         "_id": "null", 
-        #         "tot_tp": {
-        #             "$sum": {
-        #                 "$size": "$trackpoints"
-        #             }
-        #         }
-        #     }
-        # }])
-        # print("Total amount of trackpoints: ", end="")
-        # for res in result:
-        #     pprint(res["tot_tp"])
+        result = db["activity"].aggregate([{
+            "$group": {
+                "_id": "null", 
+                "tot_tp": {
+                    "$sum": {
+                        "$size": "$trackpoints"
+                    }
+                }
+            }
+        }])
+        print("Total amount of trackpoints: ", end="")
+        for res in result:
+            pprint(res["tot_tp"])
 
-        # print("\n-----------------------------------------------\n")
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
         # Task 2
         # ----------------------------------------
 
-        # print("Task 2: Find avg amount of activites per user.\n")
+        print("Task 2: Find avg amount of activites per user.\n")
 
-        # ant_activites = db["activity"].count_documents({})
-        # ant_users = db["users"].count_documents({})
+        ant_activites = db["activity"].count_documents({})
+        ant_users = db["users"].count_documents({})
 
-        # print("Avg activites per user: ", round(ant_activites / ant_users, 1))
+        print("Avg activites per user: ", round(ant_activites / ant_users, 1))
 
-        # print("\n-----------------------------------------------\n")
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
         # Task 3
         # ----------------------------------------
 
-        # print("Task 3: Find the top 20 users with the highest number of activities \n")
+        print("Task 3: Find the top 20 users with the highest number of activities \n")
 
-        # pipeline = [
-        #     { "$group": {
-        #         "_id": "$user",
-        #         "count": { "$sum": 1 }
-        #         }
-        #     },
-        #     { "$sort": { "count": -1 } },
-        # { "$limit": 20 }
-        # ]
+        pipeline = [
+            { "$group": {
+                "_id": "$user",
+                "count": { "$sum": 1 }
+                }
+            },
+            { "$sort": { "count": -1 } },
+        { "$limit": 20 }
+        ]
 
-        # result = db.activity.aggregate(pipeline)
+        result = db.activity.aggregate(pipeline)
 
-        # for document in result:
-        #     print(document)
+        for document in result:
+            print(document)
 
-        # print("\n-----------------------------------------------\n")
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -95,26 +95,7 @@ def main():
         # Task 5
         # ----------------------------------------
 
-        # print("Task 5: Find all types of transportation modes and count how many activities that are tagged with these transportation mode labels. Do not count the rows where the mode is null \n")
-
-        # result = db["activity"].aggregate([{
-        #         "$match": {
-        #             "transportation_mode": {
-        #                 "$ne": "none"
-        #             }
-        #         }
-        #     }, {
-        #         "$group": {
-        #             "_id": "$transportation_mode",
-        #             "tot": { "$sum": 1 }
-        #         }
-        #     }, {
-        #         "$sort": {
-        #             "tot": -1
-        #         }
-        #     }])
-        # for res in result:
-        #     pprint(res)
+        print("Task 5: Find all types of transportation modes and count how many activities that are tagged with these transportation mode labels. Do not count the rows where the mode is null \n")
 
         result = db["activity"].aggregate([{
                 "$match": {
@@ -190,10 +171,27 @@ def main():
         # Task 7
         # ----------------------------------------
 
-        # print("Task 7: Find the total distance (in km) walked in 2008, by user with id=112 ")
-        # Insert code here
+        print("Task 7: Find the total distance (in km) walked in 2008, by user with id=112 ")
 
-        # print("\n-----------------------------------------------\n")
+        user_112 = db['activity'].find({
+            'user': '112', 
+            'start_date': { '$gte': '2008/01/01' }, 
+            'end_date': { '$lt': '2009/01/01' }, 
+            'transportation_mode': 'walk'
+        })
+
+        sum = 0
+        for document in user_112:
+            trackpoints = document['trackpoints']
+            for i in range(len(trackpoints) - 1):
+                coord1 = map(float, trackpoints[i]['coordinate'])
+                coord2 = map(float, trackpoints[i + 1]['coordinate'])
+                distance = haversine(coord1, coord2, unit=Unit.KILOMETERS)
+                sum += distance
+        
+        print('\nUser 112 has walked', round(sum, 2), 'km in 2008')
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -222,9 +220,7 @@ def main():
         print("User | Altitude gain")
         sorted_result = sorted(result, key=lambda x: x["altitude"], reverse=True)
         for i in range(0, 20):
-            print(round(sorted_result[i], 0))
-
-                
+            print(sorted_result[i]["id"],"\t", str(round(sorted_result[i]["altitude"], 0)), "feet")
 
         print("\n-----------------------------------------------\n")
 
@@ -233,20 +229,66 @@ def main():
         # Task 9
         # ----------------------------------------
 
-        # print("Task 9: Find all users who have invalid activities, and the number of invalid activities per user ")
-        # Insert code here
+        print("Task 9: Find all users who have invalid activities, and the number of invalid activities per user ")
 
-        # print("\n-----------------------------------------------\n")
+        activities = db["activity"].find()
+        users = db["users"].find()
+
+        result = np.zeros(len(list(users)), dtype=np.int8)
+
+        for activity in activities:
+            error = False
+            for i in range(1, len(activity["trackpoints"])):
+                time1 = float(activity["trackpoints"][i-1]["date_days"])
+                time2 = float(activity["trackpoints"][i]["date_days"])
+
+                if abs(time1 - time2) > 0.003472222: # approximate five minutes
+                    error = True
+                    break
+
+            if error:
+                user = int(activity["user"])
+                result[user] += 1
+                continue
+
+        print("User | Error")
+        for i in range(0, len(result)):
+            print(str(i), "\t", str(result[i]))
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
         # Task 10
         # ----------------------------------------
 
-        # print("Task 10: Find the users who have tracked an activity in the Forbidden City of Beijing ")
-        # Insert code here
+        print("Task 10: Find the users who have tracked an activity in the Forbidden City of Beijing ")
 
-        # print("\n-----------------------------------------------\n")
+        # Query the collection to find users in Beijing within the specified radius
+        user_coord = db['activity'].find({}, {
+            "_id": 0,
+            "user": 1,
+            "trackpoints.coordinate": 1
+        })
+
+        # Create a dictionary to store users who have tracked the Forbidden City
+        users_in_beijing = []
+
+        # Iterate through the query results
+        hei = set()
+        for user_data in user_coord:
+            user = user_data.get("user")
+            trackpoints = user_data.get("trackpoints", [])
+            hei.add(user)
+            # Check if any trackpoint is within the Forbidden City's vicinity
+            for trackpoint in trackpoints:
+                lat, lon = map(float, trackpoint["coordinate"])
+                if abs(lat - 39.916) < 0.009 and abs(lon - 116.397) < 0.009: # approxemently 1 km radius
+                    if user not in users_in_beijing:
+                        users_in_beijing.append(user)
+                        print('user',user, 'has been in forbidden city in Beijing')
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -287,7 +329,9 @@ def main():
         print("User | Mode")
         print(tabulate(result))
 
-        print("\n-----------------------------------------------\n")
+        # ----------------------------------------
+        # Tasks finished
+        # ----------------------------------------
 
         connection.close_connection()
     except Exception as e:
