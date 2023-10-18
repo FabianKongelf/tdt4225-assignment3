@@ -222,7 +222,7 @@ def main():
                     "$ne": "none"
                 }
             }
-        }, { # group on user and transportation mode
+        }, { # count users and modes
             "$group": {
                 "_id": {
                     "user": "$user", 
@@ -230,14 +230,17 @@ def main():
                 },
                 "count": { "$sum": 1 }
             }
-        }, { # sort count highest first
-            "$sort": { "count": -1 }
-        }, { # reformat to list only first entry (highest)
+        }, { # sort on count, highest first
+            "$sort": { 
+                "count": -1,
+                "_id.mode": 1
+            }
+        }, { # group by user
             "$group": {
                 "_id": "$_id.user",
-                "most_used_mode": { "$first": "$_id.mode" },
+                "most_used_mode": { "$first": "$_id.mode" }, # pick first entry for user (from sorting above)
             }
-        }, { # sort so lowest id is first, aestetic
+        }, { # sort by id, lowest user id first
             "$sort": { "_id": 1 }
         }])
 

@@ -20,23 +20,23 @@ def main():
                     "$ne": "none"
                 }
             }
-        }, { # group on user
+        }, { # count users and modes
             "$group": {
                 "_id": {"user": "$user", "mode": "$transportation_mode"},
                 "count": { "$sum": 1 }
             }
-        }, {
-            "$sort": { "count": -1 }
-        }, {
+        }, { # sort on count, highest first
+            "$sort": { 
+                "count": -1,
+                "_id.mode": 1
+            }
+        }, { # group by user
             "$group": {
                 "_id": "$_id.user",
-                "most_used_mode": {"$first": "$_id.mode"},
-                # "count": {"$first": "$count"}
+                "most_used_mode": { "$first": "$_id.mode" }, # pick first entry for user (from sorting above)
             }
-        }, {
-            "$sort": {
-                "_id": 1
-            }
+        }, { # sort by id, lowest user id first
+            "$sort": { "_id": 1 }
         }])
         
         print("User | Mode")
