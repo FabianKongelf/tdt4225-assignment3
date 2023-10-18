@@ -146,9 +146,14 @@ def main():
 
         print("Task 6: a) Find the year with the most activities \n")
 
+        # years of the dataset
         years = ["2007", "2008", "2009", "2010", "2011"]
+
+        # list for storing activity counts of each year (index 0 = 2007, index 1 = 2008, ...)
         activity_counts = []
 
+        # NB: I count an activity as belonging to a certain year if it has either startdate or enddate in that year
+        # That means that if an activity starts in 2007 and ends in 2008, it will count as belonging to both 2007 and 2008
         for year in years:
             cursor = db["activity"].aggregate([
                 {"$match": {
@@ -159,15 +164,17 @@ def main():
                 }},
                 {"$count": f"activities_in_{year}"}
             ])
-
+            
+            # the aggregate function returns a cursor containing dictionaries
+            # these dictionaries are parsed and the number of activities are added to the activity_counts list
             for doc in cursor:
                 key = f"activities_in_{year}"
-                if key in doc:
-                    activity_count = doc[key]
-                    activity_counts.append(activity_count) 
-    
+                activity_count = doc[key]
+                activity_counts.append(activity_count) 
+
         most_activities = max(activity_counts)
         most_active_year = activity_counts.index(most_activities) + 2007
+
         print(f'{most_active_year} was the year with most activities, reaching {most_activities} activities')
         
 
