@@ -220,10 +220,6 @@ def main():
             else: 
                 hours_per_year["garbage"] += hours
         
-        # printing each year of the dictionary
-        for key, value in hours_per_year.items():
-             print(key, value)
-        
         max_key = max(hours_per_year, key=hours_per_year.get)
         max_value = hours_per_year[max_key]
 
