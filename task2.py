@@ -136,7 +136,7 @@ def main():
         # list for storing activity counts of each year (index 0 = 2007, index 1 = 2008, ...)
         activity_counts = []
 
-        # NB: I count an activity as belonging to a certain year if it has either startdate or enddate in that year
+        # NB: We count an activity as belonging to a certain year if it has either startdate or enddate in that year
         # That means that if an activity starts in 2007 and ends in 2008, it will count as belonging to both 2007 and 2008
         for year in years:
             cursor = db["activity"].aggregate([
@@ -165,6 +165,7 @@ def main():
         print("\n\nTask 6: b) Find the year with the most recorded hours \n")
 
         # dictionary for each year 2007 - 2012
+        # the "garbage" key is a safeguard reserved for datapoints that do not belong to any of the valid years
         hours_per_year = {
           2007 : 0,
           2008 : 0,
@@ -186,18 +187,19 @@ def main():
 
         # Query
         cursor = db["activity"].find(
-            {
-                #   "user": "001" 
-             },
+            { },
             { "start_date": 1, "end_date": 1, "_id": 0 })
         
+        # Inserting the data into the dictionary
         for doc in cursor:
-            d1 = (doc['start_date'])
-            d2 = (doc['end_date'])
-            hours = hourDifference(d1, d2)
-            yearOfActivity = int(d1.split("/")[0])
+            start_date = (doc['start_date'])
+            end_date = (doc['end_date'])
+            hours = hourDifference(start_date, end_date)
+            yearOfActivity = int(start_date.split("/")[0])
             if yearOfActivity in hours_per_year:
                 hours_per_year[yearOfActivity] += hours
+
+            # filtering out invalid datapoints
             else: 
                 hours_per_year["garbage"] += hours
         
