@@ -64,11 +64,11 @@ def main():
             # Insert Activites
             # --------------------------------------------------
 
-            # create activity collection (table)
+            # create activity-collection (table)
             # program.create_coll("activity")
             activity_id = 0
 
-            # formate activites
+            # format activites
             for user in user_docs:
                 user_id = user["_id"]
                 has_label = user["has_label"]
@@ -77,7 +77,7 @@ def main():
                 # if user has labels read them
                 labels = []
                 if has_label == 1:
-                    # inseter labels    
+                    # inserts labels    
                     labels_path = os.path.join(user_data_path, "labels.txt")
                     with open(labels_path, "r") as file:
                         lines = file.readlines()[1:]
@@ -86,7 +86,7 @@ def main():
                             array_line.append(user_id)
                             labels.append(array_line)
 
-                # find all activity files assosiaded with user
+                # find all activity files associated with user
                 files_path = os.path.join(user_data_path, "Trajectory")
                 files = os.listdir(files_path)
 
@@ -104,11 +104,11 @@ def main():
                         for line in lines:
                             converted_line = line.strip().split(",")
                             
-                            # correct datatime 
+                            # correct datetime 
                             datetime = converted_line[-2] + " " + converted_line[-1]
                             datetime = datetime.replace("-", "/")
 
-                            # ajust altitute
+                            # adjust altitude
                             if converted_line[3] == -777:
                                 if len(trackpoints) > 0:
                                     altitude = trackpoints[-1][2]
@@ -131,7 +131,7 @@ def main():
                                 "datetime":     datetime
                             })
                     
-                    # ignorre data if longer then 2500
+                    # ignore data if longer than 2500
                     if len(trackpoints) > 2500:
                         continue
             
