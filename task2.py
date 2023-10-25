@@ -87,11 +87,24 @@ def main():
         # Task 4
         # ----------------------------------------
 
-        # print("Task 4: Find all users who have taken a taxi \n")
+        print("Task 4: Find all users who have taken a taxi \n")
 
-        # Insert code here
+        distinct_users_with_taxi = db['activity'].distinct(
+            'user', {
+                'transportation_mode': "taxi"
+            }
+        )
 
-        # print("\n-----------------------------------------------\n")
+        data = []
+        for user in distinct_users_with_taxi:
+            document = {'user': user, 'transportation_mode': 'taxi'}
+            data.append([user, document['transportation_mode']])
+
+        headers = ['User', 'Transportation Mode']
+        table = tabulate(data, headers, tablefmt='grid')
+        print(table)
+
+        print("\n-----------------------------------------------\n")
 
 
         # ----------------------------------------
@@ -275,8 +288,10 @@ def main():
 
         activities = db["activity"].find()
         users = db["users"].find()
+        id_list = list(users)
+        user_list = [user['_id'] for user in id_list]
 
-        result = np.zeros(len(list(users)), dtype=np.int8)
+        result = np.zeros(len(user_list), dtype=np.int16)
 
         for activity in activities:
             error = False
@@ -292,10 +307,13 @@ def main():
                 user = int(activity["user"])
                 result[user] += 1
                 continue
-
-        print("User | Error")
-        for i in range(0, len(result)):
-            print(str(i), "\t", str(result[i]))
+        
+        table_data = [[user_list[i], result[i]] for i in range(len(user_list))]
+        print(tabulate(table_data, headers=[
+              "User", "Amount of invalid activities"], tablefmt="grid"))
+        # print("User | Error")
+        # for i in range(0, len(result)):
+        #     print(user_list[i], "\t", str(result[i]))
 
         print("\n-----------------------------------------------\n")
 

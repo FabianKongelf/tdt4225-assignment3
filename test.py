@@ -7,44 +7,44 @@ import os
 
 def main():
     # init program
-    try:
-        connection = DbConnector()
-        client = connection.client
-        db = connection.db
+    connection = DbConnector()
+    client = connection.client
+    db = connection.db
 
-        print("TEST TEST TEST \n" )
+    print("TEST TEST TEST \n\n\n" )
 
-        activities = db["activity"].find()
-        users = db["users"].find()
+    print("Task 9: Find all users who have invalid activities, and the number of invalid activities per user ")
 
-        result = np.zeros(len(list(users)), dtype=np.int8)
+    activities = db["activity"].find()
+    users = db["users"].find()
+    id_list = list(users)
+    user_list = [user['_id'] for user in id_list]
 
-        for activity in activities:
-            error = False
-            for i in range(1, len(activity["trackpoints"])):
-                time1 = float(activity["trackpoints"][i-1]["date_days"])
-                time2 = float(activity["trackpoints"][i]["date_days"])
+    result = np.zeros(len(user_list), dtype=np.int16)
 
-                if abs(time1 - time2) > 0.003472222: # approximate five minutes
-                    error = True
-                    break
+    for activity in activities:
+        error = False
+        for i in range(1, len(activity["trackpoints"])):
+            time1 = float(activity["trackpoints"][i-1]["date_days"])
+            time2 = float(activity["trackpoints"][i]["date_days"])
 
-            if error:
-                user = int(activity["user"])
-                result[user] += 1
-                continue
+            if abs(time1 - time2) > 0.003472222:  # approximate five minutes
+                error = True
+                break
 
-        print("User | Error")
-        for i in range(0, len(result)):
-            print(str(i), "\t", str(result[i]))
+        if error:
+            user = int(activity["user"])
+            result[user] += 1
+            continue
 
-        
-        
-    except Exception as e:
-        print("ERROR: Failed to use database:", e)
+    table_data = [[user_list[i], result[i]] for i in range(len(user_list))]
+    print(tabulate(table_data, headers=[
+            "User", "Invalid activities"], tablefmt="grid"))
+
+
+
     
-    finally:
-        connection.close_connection()
+    connection.close_connection()
 
 if __name__ == '__main__':
     main()
