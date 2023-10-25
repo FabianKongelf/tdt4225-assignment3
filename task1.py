@@ -47,7 +47,7 @@ def main():
             except Exception as e:
                 print("ERROR cant read labels file: ", e)
 
-            # reformate users
+            # reformat users
             for user_id in user_list:
                 has_label = 1 if user_id in labels else 0
                 user_docs.append({
